@@ -20,7 +20,10 @@ Pod::Spec.new do |s|
   s.platform     = :ios, "8.0"          #支持的平台及版本，这里我们呢用swift，直接上9.0
   s.requires_arc = true                 #是否使用ARC
 
+  s.prefix_header_contents = '#import <UIKit/UIKit.h>', '#import <WebKit/WebKit.h>'
+
   s.source_files  = "DHWebViewController/*.{h,m}"    #OC可以使用类似这样"Classes/**/*.{h,m}"
+  # s.source_files  = "DHWebViewController/Animator/*.{h,m}"    #OC可以使用类似这样"Classes/**/*.{h,m}"
 
   s.frameworks = 'UIKit', 'WebKit'    #所需的framework,多个用逗号隔开
   s.module_name = 'DHWebViewController'              #模块名称
