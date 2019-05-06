@@ -17,7 +17,7 @@ Pod::Spec.new do |s|
   ## 待测试通过完成后我们再发布指定release版本，使用如下方式
   #s.source       = { :git => "http://EXAMPLE/O2View.git", :tag => version }
   
-  s.platform     = :ios, "8.0"          #支持的平台及版本，这里我们呢用swift，直接上9.0
+  s.platform     = :ios, "9.0"          #支持的平台及版本，这里我们呢用swift，直接上9.0
   s.requires_arc = true                 #是否使用ARC
 
   s.prefix_header_contents = '#import <UIKit/UIKit.h>', '#import <WebKit/WebKit.h>'
@@ -25,13 +25,13 @@ Pod::Spec.new do |s|
   s.source_files  = "DHWebViewController/*.{h,m}"    #OC可以使用类似这样"Classes/**/*.{h,m}"
   # s.source_files  = "DHWebViewController/Animator/*.{h,m}"    #OC可以使用类似这样"Classes/**/*.{h,m}"
 
-  s.frameworks = 'UIKit', 'WebKit'    #所需的framework,多个用逗号隔开
+  s.frameworks = "UIKit", "Foundation", "WebKit"
   s.module_name = 'DHWebViewController'              #模块名称
   # s.resource_bundles = {
   	# 'image' => ['DHSideslip/image']
   # }
   s.resources = 'DHWebViewController/image.bundle'
-  s.dependency "Masonry", "~> 1.1.0"    #依赖关系，该项目所依赖的其他库，如果有多个可以写多个 s.dependency
+  s.dependency "Masonry"    #依赖关系，该项目所依赖的其他库，如果有多个可以写多个 s.dependency
 
 
 #  pod trunk push DHSideslip.podspec --allow-warnings 用于升级pod库后的更新
