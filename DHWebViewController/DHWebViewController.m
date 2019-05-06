@@ -22,14 +22,14 @@ typedef NS_ENUM(NSInteger, DHWebViewVCLoadStyle) {
     DHWebViewVCLoadStyleBePresented // 被present出来的
 };
 
-@interface DHWebViewController () <DHWebLoadStatusViewDelegate, WKNavigationDelegate>
+@interface DHWebViewController () <DHWebLoadStatusViewDelegate>
 @property (nonatomic, strong) NSURL *URL;
 @property (nonatomic, strong) UIProgressView *progressView;
 @property (nonatomic, strong) DHWebLoadStatusView *statusView;
 @property (nonatomic, strong) UIBarButtonItem *backItem;
 @property (nonatomic, strong) UIBarButtonItem *closeItem;
 @property (nonatomic, assign) DHWebViewVCLoadStyle loadStyle;
-@property (nonatomic, strong) WKWebView *webView;
+
 
 @end
 
