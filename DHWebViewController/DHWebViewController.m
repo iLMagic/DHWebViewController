@@ -210,20 +210,20 @@ typedef NS_ENUM(NSInteger, DHWebViewVCLoadStyle) {
 }
 
 #pragma mark - WKNavigationDelegate
-- (void)webView:(WKWebView *)webView decidePolicyForNavigationResponse:(WKNavigationResponse *)navigationResponse decisionHandler:(void (^)(WKNavigationResponsePolicy))decisionHandler {
-    NSLog(@"%@", navigationResponse.response.URL);
-    decisionHandler(WKNavigationResponsePolicyAllow);
-}
-
-- (void)webView:(WKWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error {
-    if (self.webView.backForwardList.currentItem) {
-        NSLog(@"内部网页跳转失败：%@", error);
-        // toast提示
-    } else {
-        NSLog(@"入口网页加载失败：%@", error);
-        [self loadError:error];
-    }
-}
+//- (void)webView:(WKWebView *)webView decidePolicyForNavigationResponse:(WKNavigationResponse *)navigationResponse decisionHandler:(void (^)(WKNavigationResponsePolicy))decisionHandler {
+//    NSLog(@"%@", navigationResponse.response.URL);
+//    decisionHandler(WKNavigationResponsePolicyAllow);
+//}
+//
+//- (void)webView:(WKWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error {
+//    if (self.webView.backForwardList.currentItem) {
+////        NSLog(@"内部网页跳转失败：%@", error);
+//        // toast提示
+//    } else {
+////        NSLog(@"入口网页加载失败：%@", error);
+//        [self loadError:error];
+//    }
+//}
 
 #pragma mark - DHWebLoadStatusViewDelegate
 - (void)loadStatusViewDidTap:(DHWebLoadStatusView *)statusView {
@@ -234,7 +234,8 @@ typedef NS_ENUM(NSInteger, DHWebViewVCLoadStyle) {
 
 /// load
 - (void)loadWithURL:(NSURL *)URL {
-    NSURLRequest *request = [NSURLRequest requestWithURL:URL];
+//    NSURLRequest *request = [NSURLRequest requestWithURL:URL];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:URL cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:15.0f];
     [self.webView loadRequest:request];
     self.webView.hidden = NO;
     self.statusView.hidden = YES;

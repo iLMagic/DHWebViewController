@@ -21,7 +21,9 @@
         UITapGestureRecognizer *gr = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(viewDidTap)];
         [self addGestureRecognizer:gr];
         _reloadImgView = ({
-            UIImageView *imgView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"reload"]];
+            NSString *path = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"image.bundle"];
+            UIImage *image = [UIImage imageNamed:@"reload" inBundle:[NSBundle bundleWithPath:path] compatibleWithTraitCollection:nil];
+            UIImageView *imgView = [[UIImageView alloc] initWithImage:image];
             [self addSubview:imgView];
             [imgView mas_makeConstraints:^(MASConstraintMaker *make) {
                 make.centerX.equalTo(self);
@@ -49,7 +51,13 @@
 - (void)setError:(NSError *)error {
     _error = error;
     if (error) {
-        _desLabel.text = error.localizedDescription;
+        if (error.code == -1009) {
+            _desLabel.text = @"网络连接失败，轻触屏幕重新加载";
+        } else if (error.code == 404) {
+            _desLabel.text = @"找不到网页，轻触屏幕重新加载";
+        } else {
+            _desLabel.text = @"发生未知错误，轻触屏幕重新加载";
+        }
     } else {
         _desLabel.text = @"发生未知错误，轻触屏幕重新加载";
     }
