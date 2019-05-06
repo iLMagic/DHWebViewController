@@ -9,6 +9,9 @@
 #import <UIKit/UIKit.h>
 #import <WebKit/WebKit.h>
 
+/**
+ 支持push
+ */
 @interface DHWebViewController : UIViewController <WKNavigationDelegate>
 @property (nonatomic, strong) WKWebView *webView;
 + (instancetype)webViewWithURLString:(NSString *)URLString;
