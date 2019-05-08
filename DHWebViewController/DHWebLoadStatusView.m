@@ -7,7 +7,6 @@
 //
 
 #import "DHWebLoadStatusView.h"
-#import <Masonry/Masonry.h>
 
 @interface DHWebLoadStatusView ()
 @property (nonatomic, strong) UIImageView *reloadImgView;
@@ -24,24 +23,31 @@
             NSString *path = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"image.bundle"];
             UIImage *image = [UIImage imageNamed:@"reload" inBundle:[NSBundle bundleWithPath:path] compatibleWithTraitCollection:nil];
             UIImageView *imgView = [[UIImageView alloc] initWithImage:image];
+            imgView.translatesAutoresizingMaskIntoConstraints = NO;
             [self addSubview:imgView];
-            [imgView mas_makeConstraints:^(MASConstraintMaker *make) {
-                make.centerX.equalTo(self);
-                make.top.equalTo(self).offset(90);
-                make.width.height.offset(90);
-            }];
+            
+            NSLayoutConstraint *centerX = [NSLayoutConstraint constraintWithItem:imgView attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeCenterX multiplier:1.0 constant:0];
+            NSLayoutConstraint *top = [NSLayoutConstraint constraintWithItem:imgView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeTop multiplier:1.0 constant:90];
+            NSLayoutConstraint *height = [NSLayoutConstraint constraintWithItem:imgView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:90];
+            NSLayoutConstraint *width = [NSLayoutConstraint constraintWithItem:imgView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:90];
+
+            [self addConstraints:@[centerX, top]];
+            [imgView addConstraints:@[height, width]];
+
             imgView;
         });
         _desLabel = ({
             UILabel *label = [UILabel new];
+            label.translatesAutoresizingMaskIntoConstraints = NO;
             label.text = @"重新加载";
             label.font = [UIFont systemFontOfSize:13];
             label.textColor = [UIColor colorWithRed:189/255.0 green:189/255.0 blue:189/255.0 alpha:1.0];
             [self addSubview:label];
-            [label mas_makeConstraints:^(MASConstraintMaker *make) {
-                make.centerX.equalTo(self);
-                make.top.equalTo(self.reloadImgView.mas_bottom).offset(20);
-            }];
+            
+            NSLayoutConstraint *centerX = [NSLayoutConstraint constraintWithItem:label attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeCenterX multiplier:1.0 constant:0];
+            NSLayoutConstraint *top = [NSLayoutConstraint constraintWithItem:label attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.reloadImgView attribute:NSLayoutAttributeBottom   multiplier:1.0 constant:20];
+            [self addConstraints:@[centerX, top]];
+            
             label;
         });
     }

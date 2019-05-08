@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "DHWebViewController"             #名称
-  s.version      = "0.0.4"              #版本号
+  s.version      = "0.0.5"              #版本号
   s.summary      = "webView加载框架"       #简短介绍
   s.description  = <<-DESC
                       WKWebView加载控制器

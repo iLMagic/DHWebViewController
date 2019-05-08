@@ -5,7 +5,7 @@ target 'Example' do
   # Uncomment the next line if you're using Swift or would like to use dynamic frameworks
   # use_frameworks!
 #pod 'NJKWebViewProgress'
-pod 'Masonry'
+#pod 'Masonry'
 
   # Pods for Example
 

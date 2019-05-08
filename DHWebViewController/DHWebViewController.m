@@ -7,7 +7,7 @@
 //
 
 #import "DHWebViewController.h"
-#import <Masonry/Masonry.h>
+//#import <Masonry/Masonry.h>
 #import "DHWebLoadStatusView.h"
 #import "DHWebViewTransitionDelegate.h"
 #import <WebKit/WebKit.h>
@@ -51,6 +51,7 @@ typedef NS_ENUM(NSInteger, DHWebViewVCLoadStyle) {
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.view.backgroundColor = [UIColor redColor];
     [self judgeLoadStyle];
    
     NSString *path = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"image.bundle"];
@@ -69,50 +70,60 @@ typedef NS_ENUM(NSInteger, DHWebViewVCLoadStyle) {
     } else {
         
     }
-    
+
     _statusView = ({
         DHWebLoadStatusView *view = [DHWebLoadStatusView new];
+        view.translatesAutoresizingMaskIntoConstraints = NO;
         view.delegate = self;
         [self.view addSubview:view];
-        [view mas_makeConstraints:^(MASConstraintMaker *make) {
-            if (@available(iOS 11.0, *)) {
-                make.top.equalTo(self.view.mas_safeAreaLayoutGuideTop);
-                make.left.equalTo(self.view.mas_safeAreaLayoutGuideLeft);
-                make.right.equalTo(self.view.mas_safeAreaLayoutGuideRight);
-            } else {
-                make.top.equalTo(self.view);
-                make.left.equalTo(self.view);
-                make.right.equalTo(self.view);
-            }
-            make.bottom.equalTo(self.view);
-        }];
+        if (@available(iOS 11.0, *)) {
+            [view.layoutMarginsGuide.leadingAnchor constraintEqualToSystemSpacingAfterAnchor:self.view.safeAreaLayoutGuide.leadingAnchor multiplier:1.0f].active = YES;
+            [self.view.safeAreaLayoutGuide.rightAnchor constraintEqualToSystemSpacingAfterAnchor:view.layoutMarginsGuide.rightAnchor multiplier:1.0f].active = YES;
+            [view.layoutMarginsGuide.topAnchor constraintEqualToSystemSpacingBelowAnchor:self.view.safeAreaLayoutGuide.topAnchor multiplier:1.0f].active = YES;
+            [self.view.bottomAnchor constraintEqualToSystemSpacingBelowAnchor:view.layoutMarginsGuide.bottomAnchor multiplier:1.0f].active = YES;
+        } else {
+        
+            NSLayoutConstraint *left = [NSLayoutConstraint constraintWithItem:view attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeLeft multiplier:1.0 constant:0];
+            NSLayoutConstraint *right = [NSLayoutConstraint constraintWithItem:view attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeRight multiplier:1.0 constant:0];
+            NSLayoutConstraint *top = [NSLayoutConstraint constraintWithItem:view attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeTopMargin multiplier:1.0 constant:0];
+            NSLayoutConstraint *bottom = [NSLayoutConstraint constraintWithItem:view attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeBottom multiplier:1.0 constant:0];
+            [self.view addConstraints:@[left, right, top, bottom]];
+        }
         view;
     });
     
     _webView = ({
         WKWebView *view = [[WKWebView alloc] init];
+        view.translatesAutoresizingMaskIntoConstraints = NO;
         view.navigationDelegate = self;
         view.allowsBackForwardNavigationGestures = YES;
         [self.view addSubview:view];
-        [view mas_makeConstraints:^(MASConstraintMaker *make) {
-            make.edges.equalTo(self.statusView);
-        }];
+
+        NSLayoutConstraint *left = [NSLayoutConstraint constraintWithItem:view attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:self.statusView attribute:NSLayoutAttributeLeft multiplier:1.0 constant:0];
+        NSLayoutConstraint *right = [NSLayoutConstraint constraintWithItem:view attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:self.statusView attribute:NSLayoutAttributeRight multiplier:1.0 constant:0];
+        NSLayoutConstraint *top = [NSLayoutConstraint constraintWithItem:view attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.statusView attribute:NSLayoutAttributeTop multiplier:1.0 constant:0];
+        NSLayoutConstraint *bottom = [NSLayoutConstraint constraintWithItem:view attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self.statusView attribute:NSLayoutAttributeBottom multiplier:1.0 constant:0];
+        [self.view addConstraints:@[left, right, top, bottom]];
+
         view;
     });
 
     _progressView = ({
         UIProgressView *p = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleDefault];
-//        p.backgroundColor = [UIColor clearColor];
+        p.translatesAutoresizingMaskIntoConstraints = NO;
         p.trackTintColor = [UIColor clearColor];
         p.progressTintColor = [UIColor colorWithRed:20/255.0 green:185/255.0 blue:15/255.0 alpha:1.0];
         [self.view addSubview:p];
-        [p mas_makeConstraints:^(MASConstraintMaker *make) {
-            make.top.left.right.equalTo(self.webView);
-            make.height.offset(2);
-        }];
+        
+        NSLayoutConstraint *left = [NSLayoutConstraint constraintWithItem:p attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:self.webView attribute:NSLayoutAttributeLeft multiplier:1.0 constant:0];
+        NSLayoutConstraint *right = [NSLayoutConstraint constraintWithItem:p attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:self.webView attribute:NSLayoutAttributeRight multiplier:1.0 constant:0];
+        NSLayoutConstraint *top = [NSLayoutConstraint constraintWithItem:p attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.webView attribute:NSLayoutAttributeTop multiplier:1.0 constant:0];
+        NSLayoutConstraint *height = [NSLayoutConstraint constraintWithItem:p attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:2.5f];
+        [self.view addConstraints:@[left, right, top]];
+        [p addConstraint:height];
         p;
     });
-    
+
     // kvo 监听网页加载进度
     [self.webView addObserver:self forKeyPath:@"estimatedProgress" options:NSKeyValueObservingOptionNew context:nil];
     // kvo 监听网页title
@@ -215,15 +226,15 @@ typedef NS_ENUM(NSInteger, DHWebViewVCLoadStyle) {
 //    decisionHandler(WKNavigationResponsePolicyAllow);
 //}
 //
-//- (void)webView:(WKWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error {
-//    if (self.webView.backForwardList.currentItem) {
-////        NSLog(@"内部网页跳转失败：%@", error);
-//        // toast提示
-//    } else {
-////        NSLog(@"入口网页加载失败：%@", error);
-//        [self loadError:error];
-//    }
-//}
+- (void)webView:(WKWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error {
+    if (self.webView.backForwardList.currentItem) {
+//        NSLog(@"内部网页跳转失败：%@", error);
+        // toast提示
+    } else {
+//        NSLog(@"入口网页加载失败：%@", error);
+        [self loadError:error];
+    }
+}
 
 #pragma mark - DHWebLoadStatusViewDelegate
 - (void)loadStatusViewDidTap:(DHWebLoadStatusView *)statusView {
@@ -234,7 +245,7 @@ typedef NS_ENUM(NSInteger, DHWebViewVCLoadStyle) {
 
 /// load
 - (void)loadWithURL:(NSURL *)URL {
-//    NSURLRequest *request = [NSURLRequest requestWithURL:URL];
+    // 去掉缓存
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:URL cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:15.0f];
     [self.webView loadRequest:request];
     self.webView.hidden = NO;

@@ -24,7 +24,7 @@
     self.title = @"DHWebViewController";
     // https://robot.odrcloud.cn/h5.html
     _textField.text = @"https://robot.odrcloud.cn/h5.html";
-//    _textField.text = @"https://www.baidu.com";
+    _textField.text = @"https://www.baidu.com";
 }
 
 - (IBAction)jumpH5:(id)sender {
