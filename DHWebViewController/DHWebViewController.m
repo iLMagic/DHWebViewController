@@ -7,7 +7,6 @@
 //
 
 #import "DHWebViewController.h"
-//#import <Masonry/Masonry.h>
 #import "DHWebLoadStatusView.h"
 #import "DHWebViewTransitionDelegate.h"
 #import <WebKit/WebKit.h>
@@ -29,7 +28,7 @@ typedef NS_ENUM(NSInteger, DHWebViewVCLoadStyle) {
 @property (nonatomic, strong) UIBarButtonItem *backItem;
 @property (nonatomic, strong) UIBarButtonItem *closeItem;
 @property (nonatomic, assign) DHWebViewVCLoadStyle loadStyle;
-
+@property (nonatomic, copy) void(^viewDidLoadhandler)(void);
 
 @end
 
@@ -38,20 +37,30 @@ typedef NS_ENUM(NSInteger, DHWebViewVCLoadStyle) {
 + (instancetype)webViewWithURLString:(NSString *)URLString {
     DHWebViewController *vc = [self new];
     vc.URL = [NSURL URLWithString:URLString];
+    __weak typeof(vc) weakVC = vc;
+    vc.viewDidLoadhandler = ^{
+        [weakVC loadWithURL:weakVC.URL];
+    };
     return vc;
 }
 
 + (instancetype)webViewWithURL:(NSURL *)URL {
     DHWebViewController *vc = [self new];
     vc.URL = URL;
+    __weak typeof(vc) weakVC = vc;
+    vc.viewDidLoadhandler = ^{
+        [weakVC loadWithURL:weakVC.URL];
+    };
+
     return vc;
 }
 
 
 
+
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.view.backgroundColor = [UIColor redColor];
+    self.view.backgroundColor = [UIColor whiteColor];
     [self judgeLoadStyle];
    
     NSString *path = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"image.bundle"];
@@ -96,6 +105,7 @@ typedef NS_ENUM(NSInteger, DHWebViewVCLoadStyle) {
         WKWebView *view = [[WKWebView alloc] init];
         view.translatesAutoresizingMaskIntoConstraints = NO;
         view.navigationDelegate = self;
+        view.UIDelegate = self;
         view.allowsBackForwardNavigationGestures = YES;
         [self.view addSubview:view];
 
@@ -132,8 +142,9 @@ typedef NS_ENUM(NSInteger, DHWebViewVCLoadStyle) {
     // kvo 监听
     [self.webView addObserver:self forKeyPath:@"canGoBack" options:NSKeyValueObservingOptionNew context:nil];
 
-    [self loadWithURL:_URL];
-    
+    if (self.viewDidLoadhandler) {
+        self.viewDidLoadhandler();
+    }
     // 添加手势
 //    UIScreenEdgePanGestureRecognizer *panGR = [[UIScreenEdgePanGestureRecognizer alloc] initWithTarget:self action:@selector(panGREvent:)];
 //    panGR.edges = UIRectEdgeLeft;
@@ -221,20 +232,27 @@ typedef NS_ENUM(NSInteger, DHWebViewVCLoadStyle) {
 }
 
 #pragma mark - WKNavigationDelegate
-//- (void)webView:(WKWebView *)webView decidePolicyForNavigationResponse:(WKNavigationResponse *)navigationResponse decisionHandler:(void (^)(WKNavigationResponsePolicy))decisionHandler {
-//    NSLog(@"%@", navigationResponse.response.URL);
-//    decisionHandler(WKNavigationResponsePolicyAllow);
-//}
-//
 - (void)webView:(WKWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error {
-    if (self.webView.backForwardList.currentItem) {
-//        NSLog(@"内部网页跳转失败：%@", error);
-        // toast提示
-    } else {
+    if (!self.webView.backForwardList.currentItem) {
 //        NSLog(@"入口网页加载失败：%@", error);
         [self loadError:error];
+    } else {
+//        NSLog(@"内部网页跳转失败：%@", error);
     }
 }
+
+#pragma mark - WKUIDelegate
+- (WKWebView *)webView:(WKWebView *)webView createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration forNavigationAction:(WKNavigationAction *)navigationAction windowFeatures:(WKWindowFeatures *)windowFeatures {
+    WKFrameInfo *frameInfo = navigationAction.targetFrame;
+    if (![frameInfo isMainFrame]) {
+        if (navigationAction.request) {
+            DHWebViewController *vc = [DHWebViewController webViewWithURL:navigationAction.request.URL];
+            [self.navigationController pushViewController:vc animated:YES];
+        }
+    }
+    return nil;
+}
+
 
 #pragma mark - DHWebLoadStatusViewDelegate
 - (void)loadStatusViewDidTap:(DHWebLoadStatusView *)statusView {
@@ -245,6 +263,10 @@ typedef NS_ENUM(NSInteger, DHWebViewVCLoadStyle) {
 
 /// load
 - (void)loadWithURL:(NSURL *)URL {
+    // 如果属性url为空，保存一下
+    if (!_URL) {
+        _URL = URL;
+    }
     // 去掉缓存
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:URL cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:15.0f];
     [self.webView loadRequest:request];
