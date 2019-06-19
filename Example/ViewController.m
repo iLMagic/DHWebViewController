@@ -28,11 +28,11 @@
 }
 
 - (IBAction)jumpH5:(id)sender {
-    _transitionDelegate = [DHWebViewTransitionDelegate new];
+//    _transitionDelegate = [DHWebViewTransitionDelegate new];
     DHWebViewController *vc = [DHWebViewController webViewWithURLString:_textField.text];
-    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
-    nav.transitioningDelegate = _transitionDelegate;
-    nav.modalPresentationStyle = UIModalPresentationCustom;
+//    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
+//    nav.transitioningDelegate = _transitionDelegate;
+//    nav.modalPresentationStyle = UIModalPresentationCustom;
 //    [self presentViewController:nav animated:YES completion:nil];
     [self.navigationController pushViewController:vc animated:YES];
 }

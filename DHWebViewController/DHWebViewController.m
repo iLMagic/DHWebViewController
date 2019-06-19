@@ -223,7 +223,11 @@ typedef NS_ENUM(NSInteger, DHWebViewVCLoadStyle) {
 }
 
 - (void)closeItemDidClick {
-    [self dismissViewControllerAnimated:YES completion:nil];
+    if (_loadStyle == DHWebViewVCLoadStyleBePushed) {
+        [self.navigationController popViewControllerAnimated:YES];
+    } else {
+        [self dismissViewControllerAnimated:YES completion:nil];
+    }
 }
 
 - (void)dealloc {
