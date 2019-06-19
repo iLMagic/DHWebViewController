@@ -21,7 +21,13 @@ typedef NS_ENUM(NSInteger, DHWebViewVCLoadStyle) {
     DHWebViewVCLoadStyleBePresented // 被present出来的
 };
 
-@interface DHWebViewController () <DHWebLoadStatusViewDelegate>
+@protocol DHBackButtonHandlerProtocol <NSObject>
+@optional
+- (BOOL)dh_navigationShouldPopOnBackButton;
+@end
+
+
+@interface DHWebViewController () <DHWebLoadStatusViewDelegate, DHBackButtonHandlerProtocol>
 @property (nonatomic, strong) NSURL *URL;
 @property (nonatomic, strong) UIProgressView *progressView;
 @property (nonatomic, strong) DHWebLoadStatusView *statusView;
@@ -55,7 +61,15 @@ typedef NS_ENUM(NSInteger, DHWebViewVCLoadStyle) {
     return vc;
 }
 
+- (BOOL)dh_navigationShouldPopOnBackButton {
+    if ([self.webView canGoBack]) {
+        [self.webView goBack];
+        return NO;
+    } else {
+        return YES;
+    }
 
+}
 
 
 - (void)viewDidLoad {
@@ -306,4 +320,40 @@ typedef NS_ENUM(NSInteger, DHWebViewVCLoadStyle) {
         }
     }
 }
+
+@end
+
+
+@implementation UINavigationController (DHShouldPopOnBackButton)
+
+- (BOOL)navigationBar:(UINavigationBar *)navigationBar shouldPopItem:(UINavigationItem *)item {
+    
+    if([self.viewControllers count] < [navigationBar.items count]) {
+        return YES;
+    }
+    
+    BOOL shouldPop = YES;
+    DHWebViewController *vc = (id)[self topViewController];
+    if([vc respondsToSelector:@selector(dh_navigationShouldPopOnBackButton)]) {
+        shouldPop = [vc dh_navigationShouldPopOnBackButton];
+    }
+    
+    if(shouldPop) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self popViewControllerAnimated:YES];
+        });
+    } else {
+        // Workaround for iOS7.1. Thanks to @boliva - http://stackoverflow.com/posts/comments/34452906
+        for(UIView *subview in [navigationBar subviews]) {
+            if(0. < subview.alpha && subview.alpha < 1.) {
+                [UIView animateWithDuration:.25 animations:^{
+                    subview.alpha = 1.;
+                }];
+            }
+        }
+    }
+    
+    return NO;
+}
+
 @end
