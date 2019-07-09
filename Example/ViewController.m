@@ -30,6 +30,7 @@
 - (IBAction)jumpH5:(id)sender {
 //    _transitionDelegate = [DHWebViewTransitionDelegate new];
     DHWebViewController *vc = [DHWebViewController webViewWithURLString:_textField.text];
+    vc.title = @"qqq";
 //    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
 //    nav.transitioningDelegate = _transitionDelegate;
 //    nav.modalPresentationStyle = UIModalPresentationCustom;

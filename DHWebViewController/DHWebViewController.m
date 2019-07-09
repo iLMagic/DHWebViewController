@@ -199,7 +199,10 @@ typedef NS_ENUM(NSInteger, DHWebViewVCLoadStyle) {
             self.progressView.alpha = 1.0f;
         }
     } else if ([keyPath isEqualToString:@"title"]) {
-        self.title = self.webView.title;
+        // 如果外部有给定title，使用外部给定的title
+        if (!self.title.length) {
+            self.title = self.webView.title;
+        }
     } else if ([keyPath isEqualToString:@"canGoBack"]) {
         if (_loadStyle == DHWebViewVCLoadStyleBePresented) {
             // 被prsent出来的控制器
