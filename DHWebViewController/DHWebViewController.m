@@ -305,18 +305,18 @@ typedef NS_ENUM(NSInteger, DHWebViewVCLoadStyle) {
 
 - (void)judgeLoadStyle {
     // 判断当前vc是push还是present出来
-    if (self.presentingViewController) {
-        _loadStyle = DHWebViewVCLoadStyleBePresented;
-        // present
+    if (self.navigationController) {
+        if (self.navigationController.childViewControllers.count == 1) {
+            // root vc (no push no present)
+            _loadStyle = DHWebViewVCLoadStyleNothing;
+        } else {
+            // push
+            _loadStyle = DHWebViewVCLoadStyleBePushed;
+        }
     } else {
-        if (self.navigationController) {
-            if (self.navigationController.childViewControllers.count == 1) {
-                // root vc (no push no present)
-                _loadStyle = DHWebViewVCLoadStyleNothing;
-            } else {
-                // push
-                _loadStyle = DHWebViewVCLoadStyleBePushed;
-            }
+        // present
+        if (self.presentingViewController) {
+            _loadStyle = DHWebViewVCLoadStyleBePresented;
         } else {
             // root vc (no push no present)
             _loadStyle = DHWebViewVCLoadStyleNothing;
